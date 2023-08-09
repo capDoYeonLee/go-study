@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -25,6 +26,10 @@ type helloWorldResponse struct {
 	Id      int    `json:"id,string"`
 }
 
+type helloWorldRequest struct {
+	Name string `json:"name"`
+}
+
 func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprint(w, "Hello world\n")
 	//response := helloWorldResponse{Message: "HelloWorld"}
@@ -34,7 +39,19 @@ func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	//}
 	//fmt.Fprint(w, string(data))
 
-	response := helloWorldResponse{Message: "HelloWorld"}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+	}
+	var request helloWorldRequest
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	response := helloWorldResponse{Message: "hello " + request.Name}
+
 	encoder := json.NewEncoder(w)
 	encoder.Encode(&response)
 
