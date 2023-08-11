@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -31,28 +30,36 @@ type helloWorldRequest struct {
 }
 
 func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	// fmt.Fprint(w, "Hello world\n")
-	//response := helloWorldResponse{Message: "HelloWorld"}
-	//data, err := json.Marshal(response) // error가 발생하지 않는다면 err은 nil값으로 들어간다.
-	//if err != nil {                     // nil 예외처리
-	//	panic("Ooops")
-	//}
-	//fmt.Fprint(w, string(data))
 
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-	}
+	//body, err := ioutil.ReadAll(r.Body)
+	//if err != nil {
+	//	http.Error(w, "Bad request", http.StatusBadRequest)
+	//}
+	//
+	//var request helloWorldRequest
+	//err = json.Unmarshal(body, &request)
+	//if err != nil {
+	//	http.Error(w, "Bad request", http.StatusBadRequest)
+	//	return
+	//}
+	//
+	//response := helloWorldResponse{Message: "hello " + request.Name}
+	//
+	//encoder := json.NewEncoder(w)
+	//encoder.Encode(&response)
+
 	var request helloWorldRequest
-	err = json.Unmarshal(body, &request)
+	decoder := json.NewDecoder(r.Body)
+
+	err := decoder.Decode(&request)
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		http.Error(w, "Bad requset", http.StatusBadRequest)
 		return
 	}
 
-	response := helloWorldResponse{Message: "hello " + request.Name}
+	response := helloWorldResponse{Message: "Hello " + request.Name}
 
 	encoder := json.NewEncoder(w)
-	encoder.Encode(&response)
+	encoder.Encode(response)
 
 }
