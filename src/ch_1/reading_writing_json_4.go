@@ -52,6 +52,9 @@ func newValidationHandler(next http.Handler) http.Handler {
 	return validationHandler{next: next}
 }
 
+// 요청의 유효성 검사
+// Go의 미들웨어 패턴
+// 미들웨워는 HTTP 요청을 중간에서 가로채고 수정, 검증, 추가 작업 등을 수행한 다음 요청을 다음 핸들러로 전달하는 역할
 func (h validationHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request helloWorldRequest
 	decoder := json.NewDecoder(r.Body)
