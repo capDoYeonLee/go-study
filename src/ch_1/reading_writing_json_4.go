@@ -19,7 +19,7 @@ func main() {
 
 	port := 8080
 
-	http.HandleFunc("/helloworld", helloWorldHandler)
+	http.HandleFunc("/helloworld", helloWorldHandler) // DefaultServeMux.HandleFunc(pattern string, handler Handler)
 
 	log.Printf("Server starting on port %v\n ", 8080)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
@@ -28,16 +28,16 @@ func main() {
 
 func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
 
-	var request helloWorldRequest
+	var requestHello helloWorldRequest
 	decoder := json.NewDecoder(r.Body)
 
-	err := decoder.Decode(&request)
+	err := decoder.Decode(&requestHello)
 	if err != nil {
 		http.Error(w, "Bad requset", http.StatusBadRequest)
 		return
 	}
 
-	response := helloWorldResponse{Message: "Hello " + request.Name}
+	response := helloWorldResponse{Message: "Hello " + requestHello.Name}
 
 	encoder := json.NewEncoder(w)
 	encoder.Encode(response)
@@ -53,8 +53,8 @@ func newValidationHandler(next http.Handler) http.Handler {
 }
 
 // 요청의 유효성 검사
-// Go의 미들웨어 패턴
-// 미들웨워는 HTTP 요청을 중간에서 가로채고 수정, 검증, 추가 작업 등을 수행한 다음 요청을 다음 핸들러로 전달하는 역할
+// Go의 미들웨어 체인 패턴
+// 미들웨어 체인 패턴은 HTTP 요청을 중간에서 가로채고 수정, 검증, 추가 작업 등을 수행한 다음 요청을 다음 핸들러로 전달하는 역할
 func (h validationHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request helloWorldRequest
 	decoder := json.NewDecoder(r.Body)
