@@ -64,3 +64,16 @@ func (h validationHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	h.next.ServeHTTP(rw, r)
 
 }
+
+type hellowWorldHandler struct{}
+
+func newHelloWorldhandler() http.Handler {
+	return hellowWorldHandler{}
+}
+
+func (h hellowWorldHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	response := helloWorldResponse{Message: "Hello"}
+	encoder := json.NewEncoder(rw)
+	encoder.Encode(response)
+
+}
