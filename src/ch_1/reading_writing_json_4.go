@@ -59,6 +59,7 @@ func newValidationHandler(next http.Handler) http.Handler {
 // Go의 미들웨어 체인 패턴
 // 미들웨어 체인 패턴은 HTTP 요청을 중간에서 가로채고 수정, 검증, 추가 작업 등을 수행한 다음 요청을 다음 핸들러로 전달하는 역할
 func (h validationHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+
 	var request helloWorldRequest
 	decoder := json.NewDecoder(r.Body)
 
@@ -67,6 +68,9 @@ func (h validationHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "Bad request", http.StatusBadRequest)
 		return
 	}
+	c := context.WithValue(r.Context(), validationContextKey("name"), request.Name)
+	r = r.WithContext(c)
+
 	h.next.ServeHTTP(rw, r)
 
 }
