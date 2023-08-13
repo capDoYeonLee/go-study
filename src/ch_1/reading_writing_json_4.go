@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+type validationContextKey string
+
 type helloWorldResponse struct {
 	Message string `json:"message"`
 }
@@ -68,6 +70,7 @@ func (h validationHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "Bad request", http.StatusBadRequest)
 		return
 	}
+	// request 요청에 대한 새 컨텍스를를 만든 후, 요청의 Name 필드 값을 컨텍스트에 설정한다
 	c := context.WithValue(r.Context(), validationContextKey("name"), request.Name)
 	r = r.WithContext(c)
 
@@ -82,7 +85,9 @@ func newHelloWorldhandler() http.Handler {
 }
 
 func (h hellowWorldHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	response := helloWorldResponse{Message: "Hello"}
+
+	name := r.Context().Value(validationContextKey("name")).(string)
+	response := helloWorldResponse{Message: "Hello" + name}
 	encoder := json.NewEncoder(rw)
 	encoder.Encode(response)
 
